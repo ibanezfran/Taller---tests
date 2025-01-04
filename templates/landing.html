@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    {% block head %}
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      {% block styles %}
+        {{ bootstrap.load_css() }}
+      {% endblock %}
+      <title>🎥¡Prepárate para Pipoca!🍿</title>
+    {% endblock %}
+  </head>
+  <body>
+    {% block content %}
+      <div class="container col-xxl-8 px-4 py-5">
+        <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+          <div class="col-lg-6">
+            <h1> 🎥¡Pipoca está por llegar!🍿</h1>
+            <p>¿Cansado de perder horas buscando qué ver? ✨Pipoca lo hace por ti✨</p>
+            <p>Con Pipoca, encuentra la película o serie perfecta en segundos</p>
+            <h2>¡Únete a la revolución del cine! 🚀</h2>
+            <p>El gran estreno está programado para enero de 2025. 📅 ¡No te quedes fuera! 🌟</p>
+            <a href="{{ url_for('ask_name') }}" class="btn btn-primary mb-3"> 🙋‍♂️¡Ingresa tu nombre y visita tu perfil!🙋‍♀️ </a>
+            <p class="cta">🍿 Descubre tu próxima peli favorita en Pipoca 🍿</p>
+          </div>
+          <div class="col-10 col-sm-8 col-lg-6">
+            <img src="{{ url_for('static', filename='chata.jpg') }}" class="d-block mx-lg-auto" />
+          </div>
+        </div>
+      </div>
+    {% endblock %}
+    {% block scripts %}
+      {{ bootstrap.load_js() }}
+    {% endblock %}
+  </body>
+</html>

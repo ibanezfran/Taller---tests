@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    {% block head %}
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      {% block styles %}
+        {{ bootstrap.load_css() }}
+      {% endblock %}
+      <title>Perfil de {{ username }}</title>
+    {% endblock %}
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="display-4">Perfil de {{ username }}</h1>
+      {% if success_message %}
+        <div class="alert alert-success" role="alert">
+          {{ success_message }}
+        </div>
+      {% endif %}
+      <form method="POST">
+        <div class="mb-3">
+          <label for="movie" class="form-label">Película favorita</label>
+          <input type="text" class="form-control" id="movie" name="movie" value="{{ user_info.get('favorite_movie', '') }}">
+        </div>
+        <div class="mb-3">
+          <label for="genre" class="form-label">Género favorito</label>
+          <input type="text" class="form-control" id="genre" name="genre" value="{{ user_info.get('favorite_genre', '') }}">
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar preferencias</button>
+      </form>
+      <a href="{{ url_for('chat', username=username) }}" class="btn btn-secondary mt-3">Ir al Chat</a>
+    </div>
+  </body>
+</html>

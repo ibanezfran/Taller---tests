@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    {% block head %}
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      {% block styles %}
+        {{ bootstrap.load_css() }}
+      {% endblock %}
+      <title>🎥 Chat de Recomendaciones - Pipoca 🍿</title>
+    {% endblock %}
+  </head>
+  <body>
+    <div class="container py-5">
+      <h1 class="display-4 text-center">🎬 Hola, {{ username }}! 🍿</h1>
+      <p class="text-center">Solicita recomendaciones de películas.</p>
+      <div class="d-flex justify-content-center gap-3">
+        <button id="preferences-btn" class="btn btn-primary">🎥 Basadas en tus gustos</button>
+        <button id="trending-btn" class="btn btn-secondary">🔥 Películas en tendencia</button>
+      </div>
+      <div class="mt-4" id="recommendation-box">
+        <h4 id="recommendation-title" class="text-center"></h4>
+        <p id="recommendation-content" class="text-center"></p>
+      </div>
+
+      <div class="mt-5">
+        <h3>Chat con Pipoca</h3>
+        <div id="chat-box" class="p-3 border rounded" style="max-height: 300px; overflow-y: auto;">
+          <div class="d-flex">
+            <img src="{{ url_for('static', filename='image.png') }}" alt="Pipoca" width="50">
+            <p><strong>Pipoca:</strong> ¡Hola! ¿Qué película te gustaría ver hoy?</p>
+          </div>
+        </div>
+        <input type="text" id="chat-input" class="form-control mt-3" placeholder="Escribe tu mensaje">
+        <button id="send-btn" class="btn btn-primary mt-3">Enviar</button>
+      </div>
+    </div>
+
+    <script>
+      const chatBox = document.getElementById('chat-box');
+      const chatInput = document.getElementById('chat-input');
+      const sendButton = document.getElementById('send-btn');
+      const recommendationBox = document.getElementById('recommendation-box');
+      const recommendationTitle = document.getElementById('recommendation-title');
+      const recommendationContent = document.getElementById('recommendation-content');
+      const preferencesButton = document.getElementById('preferences-btn');
+      const trendingButton = document.getElementById('trending-btn');
+
+      const addMessage = (sender, message) => {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('d-flex', 'my-2', sender === 'user' ? 'justify-content-end' : 'justify-content-start');
+        messageDiv.innerHTML = `
+          <div class="${sender === 'user' ? 'bg-primary text-white' : 'bg-light text-dark'} rounded p-2">
+            <p><strong>${sender === 'user' ? 'Tú' : 'Pipoca'}:</strong> ${message}</p>
+          </div>
+        `;
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      };
+
+      const sendMessage = () => {
+        const userMessage = chatInput.value.trim();
+        if (!userMessage) return;
+
+        addMessage('user', userMessage);
+        chatInput.value = '';
+
+        fetch('/chat_message', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ message: userMessage }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.reply) {
+              addMessage('Pipoca', data.reply);
+            } else {
+              addMessage('Pipoca', 'Lo siento, ocurrió un error. Intenta de nuevo más tarde.');
+            }
+          })
+          .catch(() => {
+            addMessage('Pipoca', 'Lo siento, ocurrió un error de conexión. Intenta de nuevo.');
+          });
+      };
+
+      const fetchRecommendation = (type) => {
+        recommendationTitle.textContent = "Cargando recomendación...";
+        recommendationContent.textContent = "";
+
+        fetch('/get_recommendation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ type, username: "{{ username }}", user_preferences: {{ user_info | tojson }} }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.recommendation) {
+              recommendationTitle.textContent = type === "preferences" ? "🎥 Basado en tus gustos" : "🔥 Película en tendencia";
+              recommendationContent.textContent = data.recommendation;
+            } else {
+              recommendationTitle.textContent = "Error";
+              recommendationContent.textContent = data.error || "Ocurrió un problema al obtener la recomendación.";
+            }
+          })
+          .catch(() => {
+            recommendationTitle.textContent = "Error";
+            recommendationContent.textContent = "Ocurrió un problema de conexión.";
+          });
+      };
+
+      sendButton.addEventListener('click', sendMessage);
+      chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      preferencesButton.addEventListener('click', () => fetchRecommendation("preferences"));
+      trendingButton.addEventListener('click', () => fetchRecommendation("trending"));
+    </script>
+  </body>
+</html>

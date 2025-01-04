@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% block head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% block styles %}
+        {{ bootstrap.load_css() }}
+        <style>
+            /* Agregamos el estilo para el fondo amarillo claro */
+            body {
+                background-color: #f8e784; /* Puedes ajustar el tono de amarillo si lo deseas */
+            }
+        </style>
+    {% endblock %}
+    <title>{% block title %}{% endblock %}</title>
+    {% endblock %}
+</head>
+<body>
+    {% block content %}
+    {% endblock %}
+    {% block scripts %}
+        {{ bootstrap.load_js() }}
+    {% endblock %}
+</body>
+</html>
